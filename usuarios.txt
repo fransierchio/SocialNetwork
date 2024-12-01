@@ -1,0 +1,2 @@
+99;francesco sierchio;sierchio;francesco;123456;francesco.jpg;Futbol,Gym,Videojuegos,Programacion,Finanzas
+25;David;david@gmail.com;david;123456;david.jpg;Videojuegos,Programacion,Cocina
