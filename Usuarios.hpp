@@ -21,6 +21,28 @@ class Grafos
         }
     }
 
+void obtenerAmistades(int nodo, int amigos[6]) {
+    for (int i = 0; i < 6; i++) {
+        amigos[i] = 0;
+    }
+
+    bool nodoExiste = false;
+    for (int n : nodos) {
+        if (n == nodo) {
+            nodoExiste = true;
+            break;
+        }
+    }
+
+    if (!nodoExiste) {
+        return;  
+    }
+    
+    for (int i = 0; i < 6; i++) {
+        amigos[i] = amistades[nodo][i];
+    }
+}
+
     void agregarNodo(int nodo) {
         if(nodos.size()<100)
         {
@@ -213,32 +235,95 @@ class Grafos
     }
 }
 
-    void mostrarTodosAmigos(int nodo1, int amigos[],int &numAmigos)
-    {
-        numAmigos=0;
-        bool nodoExiste = false;
-        for (int nodo : nodos) {
+    void mostrarTodosAmigos(int nodo1, int amigos[], int &numAmigos) {
+    numAmigos = 0;
+    bool nodoExiste = false;
+
+    for (int nodo : nodos) {
         if (nodo == nodo1) {
             nodoExiste = true;
             break;
         }
-        }
+    }
 
-        if (!nodoExiste) {
-            return;
-        }
+    if (!nodoExiste) {
+        return;
+    }
 
-        // Guardar los amigos en el array
-        for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < 6; i++) {
         if (amistades[nodo1][i] != 0) {
             amigos[numAmigos++] = amistades[nodo1][i];
         }
+    }
+
+    if (numAmigos == 0) {
+        return;
+    }
+
+    int x = 365, y = 570;
+
+    for (int i = 0; i < numAmigos; i++) {
+        int nodoAmigo = amigos[i];
+        ifstream archivo("usuarios.txt");
+        string linea;
+        char user[100];
+
+        while (getline(archivo, linea)) {
+            int pos1 = linea.find(';');
+            int pos2 = linea.find(';', pos1 + 1);
+            int pos3 = linea.find(';', pos2 + 1);
+            int pos4 = linea.find(';', pos3 + 1);
+
+            int codigo = stoi(linea.substr(0, pos1));
+            if (codigo == nodoAmigo) {
+                string usuario = linea.substr(pos3 + 1, pos4 - pos3 - 1);
+                strcpy(user, usuario.c_str());
+
+                outtextxy(x, y, user);
+                y += 20;
+
+                if (y > getmaxy() - 30) {
+                    y = 100;
+                }
+                break;
+            }
+        }
+        archivo.close();
+    }
+}
+
+    void recomendarAmistades(int nodoBase, int recomendaciones[], int &numRecomendaciones) 
+    {
+        bool visitado[100] = {false};
+        numRecomendaciones = 0;
+
+        visitado[nodoBase] = true;
+        for (int i = 0; i < 6; i++) {
+            int amigo=amistades[nodoBase][i];
+            if (amistades[nodoBase][i] != 0) {
+                visitado[amigo]=true;
+            }
         }
 
-        if (numAmigos == 0) {
-        } else {
+        for (int i = 0; i < 6; i++) {
+            int amigo = amistades[nodoBase][i];
+            if (amigo != 0) {
+
+                // Recorre los amigos del amigo
+                for (int j = 0; j < 6; j++) {
+                    int amigoDeAmigo = amistades[amigo][j];
+
+                    if (amigoDeAmigo != 0 && !visitado[amigoDeAmigo]) {
+                        recomendaciones[numRecomendaciones] = amigoDeAmigo;
+                        visitado[amigoDeAmigo] = true; 
+                        numRecomendaciones++;
+                        if (numRecomendaciones >= 4) return;
+                    }
+                }
+            }
         }
     }
+
 };
 
 class Usuarios 
@@ -638,4 +723,168 @@ class Usuarios
         return;
     }
 
+    list<string> getIntereses(){return interesesSeleccionados;}
+
+    static void recomendarAmigosxIntereses(const Usuarios &principal,int Intereses[4], Grafos &grafo) {
+        ifstream archivo("usuarios.txt");
+        string linea;
+        int ponderaciones[100][2]; 
+        int totalUsuarios = 0;
+
+        while (getline(archivo, linea)) {
+            int pos1 = linea.find(';');
+            int pos2 = linea.find(';', pos1 + 1);
+            int pos3 = linea.find(';', pos2 + 1);
+            int pos4 = linea.find(';', pos3 + 1);
+            int pos5 = linea.find(';', pos4 + 1);
+            int pos6 = linea.find(';', pos5 + 1);
+
+            int nodo = stoi(linea.substr(0, pos1));
+            string nombre = linea.substr(pos1 + 1, pos2 - pos1 - 1);
+            string correo = linea.substr(pos2 + 1, pos3 - pos2 - 1);
+            string usuario = linea.substr(pos3 + 1, pos4 - pos3 - 1);
+            string interesesStr = linea.substr(pos6 + 1);
+
+            list<string> intereses;
+            string interes = "";
+            for (char c : interesesStr) {
+                if (c == ',') {
+                    intereses.push_back(interes);
+                    interes = "";
+                } else {
+                    interes += c;
+                }
+            }
+            if (!interes.empty()) {
+                intereses.push_back(interes);
+            }
+
+            if (nodo == principal.nodo) {
+                continue;
+            }
+
+            int ponderacion = 0;
+            for (const string& interesPrincipal : principal.interesesSeleccionados) {
+                for (const string& interesOtro : intereses) {
+                    if (interesPrincipal == interesOtro) {
+                        ponderacion++;
+                    }
+                }
+            }
+
+            if (ponderacion > 0 && !grafo.comprobarAmistad(principal.nodo,nodo)) {
+                ponderaciones[totalUsuarios][0] = nodo;
+                ponderaciones[totalUsuarios][1] = ponderacion;
+                totalUsuarios++;
+            }
+        }
+
+        archivo.close();
+
+        for (int i = 0; i < totalUsuarios - 1; i++) {
+            for (int j = i + 1; j < totalUsuarios; j++) {
+                if (ponderaciones[i][1] < ponderaciones[j][1]) {
+                    swap(ponderaciones[i][0], ponderaciones[j][0]);
+                    swap(ponderaciones[i][1], ponderaciones[j][1]);
+                }
+            }
+        }
+
+         for (int i = 0; i < 4 && i < totalUsuarios; i++) {
+            Intereses[i] = ponderaciones[i][0];
+        }
+
+        //
+
+
+    }
+
+    static void mostrarRecomendaciones(int Recomendaciones[4], bool tipo)
+{
+    int x, y;
+    if(tipo==1){x = 814, y = 120;}
+    else{x=825, y= 505;}  
+    char strIcon[100], strNombre[100], strUsuario[100];
+
+    for (int i = 0; i < 4; i++)
+    {
+        int nodo = Recomendaciones[i];
+        ifstream archivo("usuarios.txt");
+        string linea;
+        while (getline(archivo, linea))
+        {
+            int pos1 = linea.find(';');
+            int pos2 = linea.find(';', pos1 + 1);
+            int pos3 = linea.find(';', pos2 + 1);
+            int pos4 = linea.find(';', pos3 + 1);
+            int pos5 = linea.find(';', pos4 + 1);
+            int pos6 = linea.find(';', pos5 + 1);
+
+            int codigo = stoi(linea.substr(0, pos1));
+            if (codigo == nodo)  
+            {
+                string usuario = linea.substr(pos3 + 1, pos4 - pos3 - 1);
+                string icon = linea.substr(pos5 + 1, pos6 - pos5 - 1);
+
+                strcpy(strIcon, icon.c_str());
+                readimagefile(strIcon, x, y, x + 110, y + 95);
+
+                strcpy(strUsuario, usuario.c_str());
+                outtextxy(x, y + 110, strUsuario);
+
+                x += 150; 
+
+                if (x > 1500)
+                {
+                    x = 100;
+                    y += 80;
+                }
+
+                break;
+            }
+        }
+        archivo.close();
+    }
+}
+
+   static void mostrarAmigos(int amigos[6]) 
+{
+    int x = 243, y = 135;
+    int columna=0;
+    char Strusuario[19];
+    ifstream archivo("usuarios.txt");
+    string linea;
+
+    while (getline(archivo, linea)) {
+        int pos1 = linea.find(';');
+        int pos2 = linea.find(';', pos1 + 1);
+        int pos3 = linea.find(';', pos2 + 1);
+        int pos4 = linea.find(';', pos3 + 1);
+        int pos5 = linea.find(';', pos4 + 1);
+        int pos6 = linea.find(';', pos5 + 1);
+
+        int codigo = stoi(linea.substr(0, pos1)); 
+        string usuario = linea.substr(pos3 + 1, pos4 - pos3 - 1); 
+        string icon = linea.substr(pos5 + 1, pos6 - pos5 - 1); 
+
+        for (int i = 0; i < 6; i++) {
+            if (amigos[i] == codigo) {
+                if(columna==3)
+                {
+                    y +=150;
+                    x=243;
+                    columna=0;
+                }
+                readimagefile(icon.c_str(), x, y, x + 110, y + 95);
+                strcpy(Strusuario,usuario.c_str());
+                outtextxy(x, y + 110, Strusuario);
+                x += 150;
+                columna++;
+                break; 
+            }
+        }
+    }
+
+    archivo.close();
+    }
 };

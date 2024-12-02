@@ -492,20 +492,13 @@ class Sistema
                 if (clicEnRectangulo(663, 662, 867, 693, x, y)) {
                     if(grafo.comprobarAmistad(codigoOne,codigoTwo))
                     {
-                        cout<<"SI HAY AMISTAD";
+                        outtextxy(970,575, (char*)"SI");
                     }else
                     {
-                        cout<<"NO HAY AMISTAD";
+                        outtextxy(970,575, (char*)"NO");
                     }
                 }
 
-
-                //AMIGOS
-                if (clicEnRectangulo(286, 657, 496, 696, x, y)) {
-                    AmigosInterfaz();
-                    menu=AMIGOS;
-                    return;
-                }
 
                 if(clicEnRectangulo(0,0,155,750,x,y)){return;}
 
@@ -521,6 +514,18 @@ class Sistema
         char usuarioOperacion[14]="";
         int IndexOne=0;
         int codigoAgg;
+        int Recomendaciones[4];
+        int numRecomendaciones;
+        int Intereses[4];
+        int Amigos[6];
+        bool tipo=0;
+        setbkcolor(COLOR(0xf3,0xf3,0xf3));
+        grafo.obtenerAmistades(ID,Amigos);
+        Usuarios::mostrarAmigos(Amigos);
+        grafo.recomendarAmistades(ID,Recomendaciones,numRecomendaciones);
+        Usuarios::recomendarAmigosxIntereses(UserPrincipal,Intereses, grafo);
+        Usuarios::mostrarRecomendaciones(Recomendaciones,1);
+        Usuarios::mostrarRecomendaciones(Intereses,0);
         while (true) 
         {
             if (ismouseclick(WM_LBUTTONDOWN)) 
@@ -540,7 +545,6 @@ class Sistema
                     setfillstyle(SOLID_FILL,COLOR(0xf3,0xf3,0xf3));
                     escribirEnCampo(180, 638, 470, 680,usuarioOperacion, 13, IndexOne, oculto);
                     Usuarios::extraerCodigo(usuarioOperacion,codigoAgg);
-                    cout<<codigoAgg;
                 }
                 
                 //AGREGAR
@@ -550,9 +554,13 @@ class Sistema
                         codigoAgg=0;
                         menu=INICIO;
                         InicioInterfaz();
+                        UserPrincipal.mostrarUsuario();
+                        manejarClickInicio();
                         return;
+                    } else 
+                    {
+                        cout<<"Invalido";
                     }
-                    x=0,y=0;
                 }
 
 
@@ -564,9 +572,14 @@ class Sistema
                         codigoAgg=0;
                         menu=INICIO;
                         InicioInterfaz();
+                        UserPrincipal.mostrarUsuario();
+                        manejarClickInicio();
                         return;
+                    } else 
+                    {
+                        cout<<"invalido";
                     }
-                    x=0,y=0;
+                    
                 }
 
                 if(clicEnRectangulo(0,0,155,750,x,y)){return;}
@@ -587,6 +600,7 @@ class Sistema
         int cantAmistades=0;
         int amigos[6];
         int numAmigos;
+        
         while (true) 
         {
             if (ismouseclick(WM_LBUTTONDOWN)) 
@@ -599,6 +613,9 @@ class Sistema
                 // agregar o eliminar 
                 //usuARIO
                 if (clicEnRectangulo(225, 130, 677, 160, x, y)) {
+                    setfillstyle(SOLID_FILL,COLOR(0xf3,0xf3,0xf3));
+                    bar(185,182,700,707);
+                    idPerfil=0;
                     oculto = false;
                     setcolor(BLACK);
                     setbkcolor(COLOR(0xf3,0xf3,0xf3));
@@ -607,23 +624,8 @@ class Sistema
                     Usuarios::extraerCodigo(usuarioOperacion,idPerfil);
                     perfil = Usuarios::cargarUsuario(idPerfil);
                     cantAmistades = grafo.contarAmistades(idPerfil);
-                    perfil.mostrarPerfil(cantAmistades);
-                }
-                
-                //Ver amigos
-                if (clicEnRectangulo(375, 585, 505, 700, x, y)) 
-                {
+                    if(idPerfil!=0){ perfil.mostrarPerfil(cantAmistades);}
                     grafo.mostrarTodosAmigos(idPerfil,amigos, numAmigos);
-                    if (numAmigos > 0) 
-                    {
-                        cout << "Amigos de " << usuarioOperacion << ":" << endl;
-                        for (int i = 0; i < numAmigos; i++) 
-                        {
-                            string amigoUsuario;
-                            Usuarios::extraerUsuario(amigoUsuario,amigos[i]);
-                            cout << "Usuario:  " << amigoUsuario << endl;
-                        }
-                    }
                 }
 
 

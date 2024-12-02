@@ -1,2 +1,8 @@
 99;francesco sierchio;sierchio;francesco;123456;francesco.jpg;Futbol,Gym,Videojuegos,Programacion,Finanzas
 25;David;david@gmail.com;david;123456;david.jpg;Videojuegos,Programacion,Cocina
+41;pedro;pedro@gmail.com;pedro;123456;pedro.jpg;Leyes,Finanzas,Fotografia,Cine
+84;juan;juan@gmail.com;juan;123456;juan.jpg;Videojuegos,Programacion,Beisbol,Cocina
+91;marlon;marlon@gmail.com;marlon;123456;marlon.jpg;Musica,Finanzas,Gym
+37;javier;javier@gmail.com;javier;123456;javier.jpg;Gym,Programacion,Cine,Fotografia
+86;matilda;matilda@gmail.com;matilda;123456;matilda.jpg;Programacion,Cocina,Arte,Musica
+42;francesco prueba;test@gmail.com;francescosie;123456;francescosie.jpg;Leyes,Cocina,Futbol,Beisbol,Gym,Programacion,Cine
