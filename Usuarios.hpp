@@ -324,6 +324,57 @@ void obtenerAmistades(int nodo, int amigos[6]) {
         }
     }
 
+   bool caminoMasCorto(int inicio, int fin, int &distanciaMinima, int camino[], int &numNodos) {
+    if (inicio == fin) {
+        camino[0] = fin;  
+        distanciaMinima = 0;  
+        numNodos = 1;  
+        return true;
+    }
+
+   
+    static bool visitado[100] = {false};
+    visitado[inicio] = true;  
+
+    int amigos[6];
+    obtenerAmistades(inicio, amigos);  
+
+    int mejorDistancia = 1e6;  
+    int mejorCamino[100]; 
+
+    
+    for (int i = 0; i < 6; i++) {
+        int amigo = amigos[i];
+        if (amigo != 0 && !visitado[amigo]) {  
+            int tempCamino[100];
+            int tempDistancia = 0, tempNumNodos = 0;
+
+            if (caminoMasCorto(amigo, fin, tempDistancia, tempCamino, tempNumNodos)) {
+                if (tempDistancia < mejorDistancia) {
+                    mejorDistancia = tempDistancia;
+                    for (int j = 0; j < tempNumNodos; j++) {
+                        mejorCamino[j] = tempCamino[j];
+                    }
+                }
+            }
+        }
+    }
+
+    visitado[inicio] = false;
+
+    if (mejorDistancia < 1e6) {
+        distanciaMinima = mejorDistancia + 1;  
+        numNodos = mejorDistancia + 1;  
+        camino[0] = inicio;  
+        for (int i = 0; i < mejorDistancia; i++) {
+            camino[i + 1] = mejorCamino[i]; 
+        }
+        return true;  
+    }
+
+    return false;  
+}
+
 };
 
 class Usuarios 
@@ -887,4 +938,7 @@ class Usuarios
 
     archivo.close();
     }
+
+    
+
 };

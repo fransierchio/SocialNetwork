@@ -600,6 +600,10 @@ class Sistema
         int cantAmistades=0;
         int amigos[6];
         int numAmigos;
+        int distancia=0; 
+        int camino[100];
+        int numNodos=0;
+        string usuariosCamino[100]={""};
         
         while (true) 
         {
@@ -615,6 +619,7 @@ class Sistema
                 if (clicEnRectangulo(225, 130, 677, 160, x, y)) {
                     setfillstyle(SOLID_FILL,COLOR(0xf3,0xf3,0xf3));
                     bar(185,182,700,707);
+                    bar(800,95,1435,690);
                     idPerfil=0;
                     oculto = false;
                     setcolor(BLACK);
@@ -626,6 +631,27 @@ class Sistema
                     cantAmistades = grafo.contarAmistades(idPerfil);
                     if(idPerfil!=0){ perfil.mostrarPerfil(cantAmistades);}
                     grafo.mostrarTodosAmigos(idPerfil,amigos, numAmigos);
+                    if(grafo.caminoMasCorto(ID,idPerfil,distancia,camino,numNodos))
+                    {
+                        int x=1000 , y=100;
+                        char strUsuario[100];
+                        if(numNodos==1)
+                        {
+                            outtextxy(x,y,(char*) "Ya son amigos");
+
+                        } else if(numNodos>1)
+                        {
+                            for (int i = 0; i < numNodos; i++)
+                            {
+                                Usuarios::extraerUsuario(usuariosCamino[i],camino[i]);
+                                strcpy(strUsuario,usuariosCamino[i].c_str());
+                                outtextxy(x,y,strUsuario);
+                                y+=30;
+                            }
+
+                        }
+                    }
+                    
                 }
 
 
@@ -636,6 +662,7 @@ class Sistema
             delay(10);
         }
     }
+    
     void manejarClickGestion()
     {
         setbkcolor(WHITE);
@@ -848,4 +875,4 @@ int main()
     ugmaFriends.iniciarSistema();   
 
     return 0;
-}
+} 
