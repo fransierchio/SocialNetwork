@@ -445,7 +445,7 @@ class Usuarios
         }
 
         if (!interesesStr.empty()) {
-            interesesStr.pop_back(); // Eliminar la última coma
+            interesesStr.pop_back(); // Eliminar la ultima coma
         }
 
             archivo << interesesStr << endl;
@@ -627,7 +627,6 @@ class Usuarios
 
     static bool eliminarUsuario_Nodo(int id, Grafos &grafo) {
 
-        //eliminar de usuario.txt
         ifstream archivo("usuarios.txt");
         ofstream archivoTemp("usuarios_temp.txt");
         string linea;
@@ -657,7 +656,7 @@ class Usuarios
         rename("usuarios_temp.txt", "usuarios.txt");
 
 
-        // Eliminar nodo de nodos.txt
+        // Eliminar nodo
         ifstream archivoNodos("nodos.txt");
         ofstream archivoNodosTemp("nodos_temp.txt");
         bool nodoEliminado = false;
@@ -939,6 +938,91 @@ class Usuarios
     archivo.close();
     }
 
-    
+    static void enviarMensaje(int origen, int receptor, const string &mensaje) {
+    ofstream archivo("mensajes.txt", ios::app);
+    archivo << origen << ";" << receptor << ";" << mensaje << endl;
+    archivo.close();
+    cout << "Mensaje enviado de " << origen << " a " << receptor << "." << endl;
+}
 
+    void consultarMensajes(int nodoReceptor) {
+    ifstream archivo("mensajes.txt");
+
+    list<pair<int, string>> mensajes;  
+
+    char linea[256];
+    while (archivo.getline(linea, 256)) {
+        int origen, receptor;
+        char contenido[20];
+
+        sscanf(linea, "%d;%d;%[^\n]", &origen, &receptor, contenido);
+
+        if ((origen == nodo && receptor == nodoReceptor) || 
+            (origen == nodoReceptor && receptor == nodo)) {
+            mensajes.push_back({origen, string(contenido)});
+
+            if (mensajes.size() > 15) {
+                mensajes.pop_front();
+            }
+        }
+    }
+
+    archivo.close();
+
+    int anchoPantalla = 1500;  
+    int xIzquierda = 670;      
+    int xDerecha = anchoPantalla - 250; 
+    int yBase = 170;          
+    int saltoY = 30;
+    char strContenido[100];        
+
+    for (auto mensaje : mensajes) 
+    {
+        strcpy(strContenido,mensaje.second.c_str());
+        if (mensaje.first == nodo) {
+            setbkcolor(BLACK);
+            setcolor(WHITE);
+            outtextxy(xDerecha, yBase, strContenido);
+        } else {
+            setbkcolor(GREEN);
+            setcolor(WHITE);
+            outtextxy(xIzquierda, yBase, strContenido);
+        }
+
+        yBase += saltoY;
+    }
+}
+
+    static void mostrarIconoChat(int codigoBuscado) {
+    ifstream archivo("usuarios.txt"); 
+
+    string linea;
+    while (getline(archivo, linea)) {
+        int pos1 = linea.find(';');
+        int pos2 = linea.find(';', pos1 + 1);
+        int pos3 = linea.find(';', pos2 + 1);
+        int pos4 = linea.find(';', pos3 + 1);
+        int pos5 = linea.find(';', pos4 + 1);
+        int pos6 = linea.find(';', pos5 + 1);
+
+
+        int codigo = stoi(linea.substr(0, pos1));             
+        string nombre = linea.substr(pos1 + 1, pos2 - pos1 - 1); 
+        string icono =  linea.substr(pos5 + 1, pos6 - pos5 - 1); 
+
+        if (codigo == codigoBuscado) {
+            char strNombre[100], strIcono[100];
+            strcpy(strNombre, nombre.c_str());
+            strcpy(strIcono, icono.c_str());
+
+            readimagefile(strIcono, 730, 32, 815, 115);
+
+            outtextxy(840, 75, strNombre);
+
+            archivo.close();
+            return;
+        }
+    }
+    archivo.close();
+}
 };

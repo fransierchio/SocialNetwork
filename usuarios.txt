@@ -6,3 +6,4 @@
 37;javier;javier@gmail.com;javier;123456;javier.jpg;Gym,Programacion,Cine,Fotografia
 86;matilda;matilda@gmail.com;matilda;123456;matilda.jpg;Programacion,Cocina,Arte,Musica
 42;francesco prueba;test@gmail.com;francescosie;123456;francescosie.jpg;Leyes,Cocina,Futbol,Beisbol,Gym,Programacion,Cine
+83;celimar ali;celimar@gmail.com;celimar;123456;celimar.jpg;Cocina,Gym,Finanzas
